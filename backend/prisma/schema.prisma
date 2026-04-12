@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Subscription {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  offerId         String   @map("offer_id")
+  offerName       String   @map("offer_name")
+  offerCategory   String   @map("offer_category")
+  clientName      String   @map("client_name")
+  clientEmail     String   @map("client_email")
+  clientPhone     String   @map("client_phone")
+  clientCIN       String   @map("client_cin")
+  clientAddress   String?  @map("client_address")
+  isFondation     Boolean? @default(false) @map("is_fondation")
+  basePrice       Decimal  @map("base_price") @db.Decimal
+  discount        Decimal? @default(0) @map("discount") @db.Decimal
+  serviceFee      Decimal? @default(0) @map("service_fee") @db.Decimal
+  routerFee       Decimal? @default(0) @map("router_fee") @db.Decimal
+  totalPrice      Decimal  @map("total_price") @db.Decimal
+  status          String?  @default("pending")
+  cinUrl          String?  @map("cin_url")
+  fondationCardUrl String? @map("fondation_card_url")
+  contractUrl     String?  @map("contract_url")
+  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status], map: "idx_subscriptions_status")
+  @@index([offerCategory], map: "idx_subscriptions_category")
+  @@index([createdAt], map: "idx_subscriptions_created")
+  @@map("subscriptions")
+}

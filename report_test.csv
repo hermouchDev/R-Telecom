@@ -1,0 +1,28 @@
+ID,Client,Email,Telephone,Offre,Prix,Statut,Date,Type
+8f95efa7,abde,ABDE@gmail.com,0650502976,Forfait 120Go+22H,220,pending,12/04/2026,Grand Public
+442ec1cb,Admin Test User,admin_test@rplus.ma,0600000000,Fibre 200 Mbps,500,approved,12/04/2026,Grand Public
+5c72c7fd,Fatima Zohra,client6@example.com,+212 632544832,Fibre 200 Mbps,500,approved,10/04/2026,Grand Public
+3aa61ff0,Sara Benjelloun,client7@example.com,+212 680829250,4G+ El Manzil,300,approved,09/04/2026,Grand Public
+a7f59f3e,Salma Jabri,client14@example.com,+212 626971981,4G+ El Manzil,225,rejected,09/04/2026,Fondation
+9d51f9cc,Laila Mansouri,client24@example.com,+212 610796891,Forfait Mobile 99 DH,99,pending,08/04/2026,Grand Public
+59fa2e7a,Omar Berrada,client18@example.com,+212 665963317,Fibre 100 Mbps,300,pending,08/04/2026,Fondation
+85dc9590,Karim Alami,client21@example.com,+212 642936832,Forfait Mobile 99 DH,74.25,pending,04/04/2026,Fondation
+b1d9088a,Mehdi Tazi,client0@example.com,+212 668113109,5G Box El Manzil,950,approved,04/04/2026,Grand Public
+4eedcfee,Mehdi Tazi,client20@example.com,+212 687275047,Fibre 100 Mbps,400,approved,02/04/2026,Grand Public
+376479ef,Youssef Filali,client22@example.com,+212 635600784,4G+ El Manzil,300,rejected,31/03/2026,Grand Public
+65f33f9c,Youssef Filali,client17@example.com,+212 615598573,Fibre 200 Mbps,500,approved,31/03/2026,Grand Public
+8aeb5e7d,Fatima Zohra,client15@example.com,+212 687745198,Fibre 200 Mbps,500,approved,31/03/2026,Grand Public
+87cc9f3e,Laila Mansouri,client12@example.com,+212 629547435,5G Box El Manzil,650,pending,30/03/2026,Fondation
+0ce27590,Karim Alami,client16@example.com,+212 644750143,Fibre 200 Mbps,500,approved,27/03/2026,Grand Public
+4f056dde,Ahmed Naciri,client4@example.com,+212 660837990,Forfait Mobile 99 DH,99,pending,26/03/2026,Grand Public
+60ce08ff,Youssef Filali,client9@example.com,+212 651604307,Forfait Mobile 199 DH,199,approved,24/03/2026,Grand Public
+5857bcd9,Sara Benjelloun,client19@example.com,+212 638847722,5G Box El Manzil,950,pending,23/03/2026,Grand Public
+d84f6d65,Salma Jabri,client23@example.com,+212 647489151,Forfait Mobile 349 DH,349,pending,22/03/2026,Grand Public
+cfec7c88,Karim Alami,client1@example.com,+212 687920710,Fibre 1 Gbps,1000,pending,22/03/2026,Grand Public
+34e2940a,Sara Benjelloun,client5@example.com,+212 657129783,Forfait Mobile 349 DH,261.75,approved,22/03/2026,Fondation
+1b96aad3,Ibrahim Chraibi,client3@example.com,+212 684629125,Forfait Mobile 349 DH,349,approved,21/03/2026,Grand Public
+5eec4555,Karim Alami,client11@example.com,+212 695361469,4G+ El Manzil,225,pending,19/03/2026,Fondation
+71b7f857,Fatima Zohra,client13@example.com,+212 67800440,Forfait Mobile 199 DH,149.25,approved,16/03/2026,Fondation
+d244f7a5,Laila Mansouri,client8@example.com,+212 640095367,Fibre 1 Gbps,750,pending,16/03/2026,Fondation
+5c2741d9,Ibrahim Chraibi,client10@example.com,+212 651494869,Forfait Mobile 199 DH,199,approved,15/03/2026,Grand Public
+e0a265d7,Fatima Zohra,client2@example.com,+212 629054852,4G+ El Manzil,300,rejected,14/03/2026,Grand Public
