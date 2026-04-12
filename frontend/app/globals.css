@@ -28,3 +28,16 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select {
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111;
+  caret-color: #111111;
+}
+
+.admin-modal input::placeholder,
+.admin-modal textarea::placeholder {
+  color: #9ca3af !important;
+}

@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  FileStack, 
-  FolderOpen, 
-  LineChart, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  FileStack,
+  FolderOpen,
+  LineChart,
+  Settings,
+  LogOut,
   UserCircle,
   Package
 } from 'lucide-react';
@@ -19,6 +19,12 @@ const AdminSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [pendingCount, setPendingCount] = useState(0);
+  const [adminName, setAdminName] = useState('Super Admin');
+
+  const loadAdminName = () => {
+    const savedName = localStorage.getItem('admin_name');
+    setAdminName(savedName || 'Super Admin');
+  };
 
   const fetchPendingCount = async () => {
     try {
@@ -28,15 +34,22 @@ const AdminSidebar = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingCount(response.data.stats?.pending || 0);
-    } catch (err) {
+    } catch {
       console.error('Failed to fetch pending count');
     }
   };
 
   useEffect(() => {
+    loadAdminName();
     fetchPendingCount();
     const interval = setInterval(fetchPendingCount, 60000); // 60s
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const onProfileUpdated = () => loadAdminName();
+    window.addEventListener('admin-profile-updated', onProfileUpdated);
+    return () => window.removeEventListener('admin-profile-updated', onProfileUpdated);
   }, []);
 
   const handleLogout = () => {
@@ -55,24 +68,22 @@ const AdminSidebar = () => {
 
   return (
     <aside className="w-[260px] bg-dark text-white flex flex-col h-screen fixed left-0 top-0 z-50">
-      {/* Logo */}
       <div className="p-8 border-b border-white/5 flex items-center space-x-2">
         <span className="text-3xl font-black text-primary italic tracking-tighter">R+</span>
         <span className="text-xl font-bold tracking-tight">ADMIN</span>
       </div>
 
-      {/* Nav */}
       <nav className="flex-grow p-6 space-y-2 mt-4">
         {navLinks.map((link) => {
           const isActive = pathname === link.href;
           return (
-            <Link 
-              key={link.href} 
+            <Link
+              key={link.href}
               href={link.href}
               className={`flex items-center justify-between p-4 rounded-2xl font-bold transition-all group ${
-                isActive 
-                ? 'bg-primary text-white shadow-lg shadow-red-500/20' 
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                isActive
+                  ? 'bg-primary text-white shadow-lg shadow-red-500/20'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -91,16 +102,15 @@ const AdminSidebar = () => {
         })}
       </nav>
 
-      {/* Footer */}
       <div className="p-6 border-t border-white/5 space-y-4">
         <div className="flex items-center space-x-3 p-2">
           <UserCircle className="w-10 h-10 text-gray-500" />
           <div className="overflow-hidden">
-            <p className="text-sm font-bold text-white truncate">Super Admin</p>
+            <p className="text-sm font-bold text-white truncate">{adminName}</p>
             <p className="text-[10px] text-gray-400">v3.0</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={handleLogout}
           className="flex items-center space-x-3 w-full p-4 text-red-400 hover:bg-red-400/10 rounded-2xl font-bold transition-all px-6"
         >

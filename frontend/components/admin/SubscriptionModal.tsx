@@ -155,9 +155,22 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const payload = {
-        ...formData,
-        // Backend expects specific camelCase for initial creation, but snake_case mapping is handled by Prisma
-        // For consistency with our new PUT route, we send camelCase which is mapped in the route
+        offerId: formData.offerId,
+        offerName: formData.offerName,
+        offerCategory: formData.offerCategory,
+        clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
+        clientPhone: formData.clientPhone,
+        clientCIN: formData.clientCIN,
+        clientAddress: formData.clientAddress,
+        address: formData.clientAddress,
+        isFondation: formData.isFondation,
+        basePrice: formData.basePrice,
+        totalPrice: formData.totalPrice,
+        discount: formData.discount,
+        serviceFee: formData.serviceFee,
+        routerFee: formData.routerFee,
+        status: formData.status
       };
 
       if (isEdit) {
@@ -192,7 +205,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="admin-modal relative w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
       >
         {/* Header */}
         <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
@@ -260,7 +273,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     <MapPin className="w-3 h-3 mr-1 text-primary" /> Adresse d'installation
                   </label>
                   <textarea 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-primary/20 h-24 resize-none transition-all outline-none font-bold"
+                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm text-dark placeholder:text-gray-400 focus:ring-2 focus:ring-primary/20 h-24 resize-none transition-all outline-none font-bold"
                     value={formData.clientAddress}
                     onChange={(e) => setFormData({...formData, clientAddress: e.target.value})}
                     placeholder="Adresse complète..."
@@ -301,7 +314,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Sélectionner Offre</label>
                   <select 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none font-black"
+                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm text-dark focus:ring-2 focus:ring-primary/20 transition-all outline-none font-black"
                     value={formData.offerId}
                     onChange={(e) => handleOfferChange(e.target.value)}
                   >
@@ -314,7 +327,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Statut</label>
                   <select 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none font-black"
+                    className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm text-dark focus:ring-2 focus:ring-primary/20 transition-all outline-none font-black"
                     value={formData.status}
                     onChange={(e) => setFormData({...formData, status: e.target.value})}
                   >
@@ -370,7 +383,7 @@ const FormInput = ({ label, value, onChange, placeholder, type = "text", icon }:
     <input 
       type={type}
       placeholder={placeholder}
-      className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none font-bold"
+      className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 text-sm text-dark placeholder:text-gray-400 focus:ring-2 focus:ring-primary/20 transition-all outline-none font-bold"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />

@@ -1,16 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Save, User, Lock, Bell, Loader2, ShieldCheck } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const ParametresPage = () => {
   const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState('Administrateur R+');
+  const [email, setEmail] = useState('admin@rplustelecom.ma');
+
+  useEffect(() => {
+    const savedName = localStorage.getItem('admin_name');
+    const token = localStorage.getItem('admin_token');
+
+    if (savedName) setFullName(savedName);
+
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload?.email) setEmail(payload.email);
+      } catch {
+        // Ignore decode failures and keep defaults.
+      }
+    }
+  }, []);
   
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    localStorage.setItem('admin_name', fullName.trim() || 'Administrateur R+');
+    window.dispatchEvent(new Event('admin-profile-updated'));
     // Simulate API call for settings
     setTimeout(() => {
       setLoading(false);
@@ -40,7 +60,8 @@ const ParametresPage = () => {
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nom complet</label>
               <input 
                 type="text" 
-                defaultValue="Administrateur R+"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full bg-gray-50 rounded-2xl px-5 py-4 text-sm font-bold text-dark outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -48,7 +69,7 @@ const ParametresPage = () => {
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email de contact</label>
               <input 
                 type="email" 
-                defaultValue="admin@rplustelecom.ma"
+                value={email}
                 disabled
                 className="w-full bg-gray-100/50 rounded-2xl px-5 py-4 text-sm font-bold text-gray-400 outline-none cursor-not-allowed"
               />

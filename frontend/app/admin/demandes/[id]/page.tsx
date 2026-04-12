@@ -33,8 +33,11 @@ const SubscriptionDetailPage = () => {
 
   const fetchDetail = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/subscriptions/${id}`);
-      setSub(response.data);
+      const token = localStorage.getItem('admin_token');
+      const response = await axios.get(`http://localhost:5000/api/subscriptions/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSub(response.data || null);
     } catch (err) {
       toast.error('Détails introuvables');
       router.push('/admin/demandes');
@@ -50,7 +53,12 @@ const SubscriptionDetailPage = () => {
   const updateStatus = async (status: string) => {
     if (!confirm(`Voulez-vous ${status === 'approved' ? 'approuver' : 'rejeter'} cette demande ?`)) return;
     try {
-      const response = await axios.patch(`http://localhost:5000/api/subscriptions/${id}/status`, { status });
+      const token = localStorage.getItem('admin_token');
+      const response = await axios.patch(
+        `http://localhost:5000/api/subscriptions/${id}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setSub(response.data);
       toast.success(`Statut mis à jour : ${status}`);
     } catch (err) {
@@ -59,6 +67,12 @@ const SubscriptionDetailPage = () => {
   };
 
   if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <Loader2 className="w-10 h-10 text-primary animate-spin" />
+    </div>
+  );
+
+  if (!sub) return (
     <div className="flex items-center justify-center min-h-[400px]">
       <Loader2 className="w-10 h-10 text-primary animate-spin" />
     </div>

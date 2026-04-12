@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Loader2, 
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Search,
+  Filter,
+  Download,
+  Loader2,
   Calendar,
   Layers,
   Plus
@@ -17,6 +16,8 @@ import * as XLSX from 'xlsx';
 import SubscriptionTable from '@/components/admin/SubscriptionTable';
 import SubscriptionModal from '@/components/admin/SubscriptionModal';
 
+const ITEMS_PER_PAGE = 20;
+
 const SubscriptionsPage = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [filteredSubs, setFilteredSubs] = useState<any[]>([]);
@@ -24,21 +25,41 @@ const SubscriptionsPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  
-  // Modal State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSub, setSelectedSub] = useState<any>(null);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE)),
+    [totalCount]
+  );
+
+  const pageNumbers = useMemo(
+    () => Array.from({ length: totalPages }, (_, i) => i + 1),
+    [totalPages]
+  );
 
   const fetchSubscriptions = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('admin_token');
       const response = await axios.get('http://localhost:5000/api/subscriptions', {
+        params: {
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          status: statusFilter,
+          category: categoryFilter
+        },
         headers: { Authorization: `Bearer ${token}` }
       });
-      setSubscriptions(response.data.data || []);
-      setFilteredSubs(response.data.data || []);
-    } catch (err) {
+
+      const rows = response.data.data || [];
+      setSubscriptions(rows);
+      setFilteredSubs(rows);
+      setTotalCount(response.data.count || 0);
+    } catch {
       toast.error('Erreur lors du chargement des demandes');
     } finally {
       setLoading(false);
@@ -47,70 +68,62 @@ const SubscriptionsPage = () => {
 
   useEffect(() => {
     fetchSubscriptions();
-  }, []);
+  }, [currentPage, statusFilter, categoryFilter]);
 
   useEffect(() => {
     let result = subscriptions;
-
     if (search) {
       const s = search.toLowerCase();
-      result = result.filter(sub => 
-        sub.client_name?.toLowerCase().includes(s) || 
+      result = result.filter((sub) =>
+        sub.client_name?.toLowerCase().includes(s) ||
         sub.client_email?.toLowerCase().includes(s) ||
         sub.client_cin?.toLowerCase().includes(s)
       );
     }
-
-    if (statusFilter !== 'all') {
-      result = result.filter(sub => sub.status === statusFilter);
-    }
-
-    if (categoryFilter !== 'all') {
-      result = result.filter(sub => sub.offer_category === categoryFilter);
-    }
-
     setFilteredSubs(result);
-  }, [search, statusFilter, categoryFilter, subscriptions]);
+  }, [search, subscriptions]);
 
   const handleApprove = async (id: string) => {
     try {
       const token = localStorage.getItem('admin_token');
-      await axios.patch(`http://localhost:5000/api/subscriptions/${id}/status`, 
+      await axios.patch(
+        `http://localhost:5000/api/subscriptions/${id}/status`,
         { status: 'approved' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Demande approuvée');
+      toast.success('Demande approuvee');
       fetchSubscriptions();
-    } catch (err) {
+    } catch {
       toast.error('Erreur');
     }
   };
 
   const handleReject = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir rejeter cette demande ?')) return;
+    if (!confirm('Etes-vous sur de vouloir rejeter cette demande ?')) return;
     try {
       const token = localStorage.getItem('admin_token');
-      await axios.patch(`http://localhost:5000/api/subscriptions/${id}/status`, 
+      await axios.patch(
+        `http://localhost:5000/api/subscriptions/${id}/status`,
         { status: 'rejected' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Demande rejetée');
+      toast.success('Demande rejetee');
       fetchSubscriptions();
-    } catch (err) {
+    } catch {
       toast.error('Erreur');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('ÊTES-VOUS SÛR ? Cette action est irréversible et supprimera définitivement la souscription.')) return;
+    if (!confirm('ETES-VOUS SUR ? Cette action est irreversible.')) return;
     try {
       const token = localStorage.getItem('admin_token');
       await axios.delete(`http://localhost:5000/api/subscriptions/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Souscription supprimée');
+      toast.success('Souscription supprimee');
       fetchSubscriptions();
-    } catch (err) {
+    } catch {
       toast.error('Erreur suppression');
     }
   };
@@ -125,29 +138,39 @@ const SubscriptionsPage = () => {
     setIsModalOpen(true);
   };
 
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryFilterChange = (value: string) => {
+    setCategoryFilter(value);
+    setCurrentPage(1);
+  };
+
   const handleExport = () => {
     if (filteredSubs.length === 0) {
-      toast.error('Aucune donnée à exporter');
+      toast.error('Aucune donnee a exporter');
       return;
     }
 
-    const data = filteredSubs.map(s => ({
+    const data = filteredSubs.map((s) => ({
       ID: s.id.substring(0, 8),
       Client: s.client_name,
       Email: s.client_email,
-      Téléphone: s.client_phone,
+      Telephone: s.client_phone,
       Offre: s.offer_name,
       Montant: `${s.total_price} DH`,
-      Statut: s.status === 'approved' ? 'Approuvée' : s.status === 'rejected' ? 'Rejetée' : 'En attente',
+      Statut: s.status === 'approved' ? 'Approuvee' : s.status === 'rejected' ? 'Rejetee' : 'En attente',
       Type: s.is_fondation ? 'Fondation' : 'Grand Public',
       Date: new Date(s.created_at).toLocaleDateString('fr-FR')
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Demandes");
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Demandes');
     XLSX.writeFile(workbook, `Demandes_RPlus_${new Date().toISOString().split('T')[0]}.xlsx`);
-    toast.success('Rapport Excel exporté !');
+    toast.success('Rapport Excel exporte');
   };
 
   return (
@@ -155,17 +178,17 @@ const SubscriptionsPage = () => {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-dark tracking-tight">Gestion des Demandes</h1>
-          <p className="text-gray-400">Consultez, modifiez ou gérez les souscriptions clients.</p>
+          <p className="text-gray-400">Consultez, modifiez ou gerez les souscriptions clients.</p>
         </div>
         <div className="flex items-center space-x-4">
-          <button 
+          <button
             onClick={handleExport}
             className="bg-white hover:bg-gray-50 text-dark border border-gray-100 font-black px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center space-x-3 text-sm"
           >
             <Download className="w-4 h-4 text-primary" />
             <span className="hidden sm:inline">EXPORTER</span>
           </button>
-          <button 
+          <button
             onClick={handleAddOpen}
             className="bg-primary hover:bg-red-700 text-white font-black px-8 py-3 rounded-2xl shadow-xl shadow-red-500/20 transition-all flex items-center space-x-3 text-sm"
           >
@@ -175,15 +198,13 @@ const SubscriptionsPage = () => {
         </div>
       </header>
 
-      {/* Filters Bar */}
-      {/* ... (filters keep as before) */}
       <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-gray-200/40 border border-gray-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
         <div className="space-y-2">
           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Recherche</label>
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Nom, Email ou CIN..."
               className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-xs text-dark font-bold focus:ring-2 focus:ring-primary/20 transition-all outline-none"
               value={search}
@@ -196,29 +217,29 @@ const SubscriptionsPage = () => {
           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Statut</label>
           <div className="relative group">
             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-            <select 
+            <select
               className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-xs text-dark font-bold focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
             >
               <option value="all">Tous les Statuts</option>
               <option value="pending">En Attente</option>
-              <option value="approved">Approuvée</option>
-              <option value="rejected">Refusée</option>
+              <option value="approved">Approuvee</option>
+              <option value="rejected">Refusee</option>
             </select>
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Catégorie</label>
+          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Categorie</label>
           <div className="relative group">
             <Layers className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-            <select 
+            <select
               className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-xs text-dark font-bold focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none"
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              onChange={(e) => handleCategoryFilterChange(e.target.value)}
             >
-              <option value="all">Toutes les Catégories</option>
+              <option value="all">Toutes les Categories</option>
               <option value="Fibre">Fibre Optique</option>
               <option value="5G">5G Box</option>
               <option value="ADSL">ADSL</option>
@@ -232,24 +253,23 @@ const SubscriptionsPage = () => {
           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Date</label>
           <div className="relative group">
             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-            <input 
+            <input
               type="date"
-              className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-xs focus:ring-2 focus:ring-primary/20 transition-all outline-none font-bold"
+              className="w-full bg-gray-50 border-none rounded-xl pl-12 pr-4 py-3 text-xs text-dark font-bold focus:ring-2 focus:ring-primary/20 transition-all outline-none"
             />
           </div>
         </div>
       </div>
 
-      {/* Main Table Container */}
       <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden min-h-[400px]">
         {loading ? (
           <div className="flex flex-col items-center justify-center p-20 space-y-4">
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
-            <p className="text-sm font-bold text-gray-300 uppercase tracking-widest leading-none mt-4">Chargement des données...</p>
+            <p className="text-sm font-bold text-gray-300 uppercase tracking-widest leading-none mt-4">Chargement des donnees...</p>
           </div>
         ) : filteredSubs.length > 0 ? (
-          <SubscriptionTable 
-            subscriptions={filteredSubs} 
+          <SubscriptionTable
+            subscriptions={filteredSubs}
             onApprove={handleApprove}
             onReject={handleReject}
             onEdit={handleEditOpen}
@@ -258,30 +278,52 @@ const SubscriptionsPage = () => {
         ) : (
           <div className="text-center py-24 space-y-4">
             <div className="p-6 bg-gray-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto text-gray-200">
-                <Search className="w-10 h-10" />
+              <Search className="w-10 h-10" />
             </div>
-            <h3 className="text-xl font-bold text-dark">Aucun résultat trouvé</h3>
-            <p className="text-gray-400 text-sm">Réessayez avec d'autres filtres ou critères de recherche.</p>
+            <h3 className="text-xl font-bold text-dark">Aucun resultat trouve</h3>
+            <p className="text-gray-400 text-sm">Reessayez avec d'autres filtres ou criteres de recherche.</p>
           </div>
         )}
 
-        {/* Pagination placeholder */}
         <div className="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-            Affichage de {filteredSubs.length} sur {subscriptions.length} demandes
+            Affichage de {filteredSubs.length} sur {totalCount} demandes
           </p>
           <div className="flex space-x-2">
-            {[1, 2, 3].map(p => (
-              <button key={p} className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${p === 1 ? 'bg-primary text-white shadow-lg shadow-red-500/20' : 'bg-white text-gray-400 hover:bg-gray-100'}`}>
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-8 h-8 rounded-lg text-xs font-black transition-all bg-white text-gray-400 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {'<'}
+            </button>
+
+            {pageNumbers.map((p) => (
+              <button
+                key={p}
+                onClick={() => setCurrentPage(p)}
+                className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${
+                  p === currentPage
+                    ? 'bg-primary text-white shadow-lg shadow-red-500/20'
+                    : 'bg-white text-gray-400 hover:bg-gray-100'
+                }`}
+              >
                 {p}
               </button>
             ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-8 h-8 rounded-lg text-xs font-black transition-all bg-white text-gray-400 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {'>'}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Modal */}
-      <SubscriptionModal 
+      <SubscriptionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         subscription={selectedSub}

@@ -21,11 +21,13 @@ router.post('/', async (req, res) => {
       clientCIN, 
       isFondation, 
       address,
+      clientAddress,
       basePrice,
       totalPrice,
       discount,
       serviceFee,
-      routerFee
+      routerFee,
+      status
     } = req.body;
 
     if (!offerId || !clientName || !clientEmail || !clientPhone || !clientCIN) {
@@ -43,14 +45,14 @@ router.post('/', async (req, res) => {
           client_email: clientEmail,
           client_phone: clientPhone,
           client_cin: clientCIN,
-          client_address: address,
+          client_address: clientAddress ?? address ?? null,
           is_fondation: isFondation,
           base_price: basePrice,
           discount: discount,
           service_fee: serviceFee,
           router_fee: routerFee,
           total_price: totalPrice,
-          status: 'pending'
+          status: status || 'pending'
         }
       ])
       .select();

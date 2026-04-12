@@ -124,7 +124,7 @@ const OfferModal: React.FC<OfferModalProps> = ({ isOpen, onClose, offer, onSucce
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-3xl bg-white rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="admin-modal relative w-full max-w-3xl bg-white rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
       >
         {/* Header */}
         <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
@@ -157,7 +157,7 @@ const OfferModal: React.FC<OfferModalProps> = ({ isOpen, onClose, offer, onSucce
                 <div className="md:col-span-2 space-y-2">
                   <Label>Nom de l'offre *</Label>
                   <input
-                    className="w-full bg-gray-50 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-gray-50 rounded-2xl px-5 py-4 text-sm text-dark placeholder:text-gray-400 font-bold outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Ex: Fibre 500 Mbps Pro"
                     value={form.name}
                     onChange={e => setForm({ ...form, name: e.target.value })}
@@ -187,7 +187,7 @@ const OfferModal: React.FC<OfferModalProps> = ({ isOpen, onClose, offer, onSucce
                   <div className="space-y-2">
                     <Label>Vitesse / Débit</Label>
                     <input
-                      className="w-full bg-gray-50 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                      className="w-full bg-gray-50 rounded-2xl px-5 py-4 text-sm text-dark placeholder:text-gray-400 font-bold outline-none focus:ring-2 focus:ring-primary/20"
                       placeholder="Ex: 200 Mbps"
                       value={form.speed}
                       onChange={e => setForm({ ...form, speed: e.target.value })}
@@ -245,7 +245,7 @@ const OfferModal: React.FC<OfferModalProps> = ({ isOpen, onClose, offer, onSucce
                   <div key={i} className="flex items-center space-x-3">
                     <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                     <input
-                      className="flex-grow bg-gray-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                      className="flex-grow bg-gray-50 rounded-xl px-4 py-3 text-sm text-dark placeholder:text-gray-400 font-bold outline-none focus:ring-2 focus:ring-primary/20"
                       placeholder={`Caractéristique ${i + 1}...`}
                       value={feat}
                       onChange={e => updateFeature(i, e.target.value)}
@@ -305,7 +305,7 @@ const PriceInput = ({ label, value, onChange, placeholder }: any) => (
       type="number"
       min="0"
       step="0.01"
-      className="w-full bg-gray-50 rounded-2xl px-4 py-4 text-sm font-black outline-none focus:ring-2 focus:ring-primary/20 text-center"
+      className="w-full bg-gray-50 rounded-2xl px-4 py-4 text-sm text-dark placeholder:text-gray-400 font-black outline-none focus:ring-2 focus:ring-primary/20 text-center"
       placeholder={placeholder}
       value={value}
       onChange={e => onChange(e.target.value)}

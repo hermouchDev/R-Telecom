@@ -106,7 +106,7 @@ router.get('/:category', async (req, res) => {
 // POST /api/offers — admin create new offer
 router.post('/', verifyAdmin, async (req, res) => {
   try {
-    const { id, category, name, speed, price, fondationPrice, serviceFee, routerFee, features } = req.body;
+    const { id, category, name, speed, price, fondationPrice, serviceFee, routerFee, features, isActive } = req.body;
 
     if (!name || !category || !price) {
       return res.status(400).json({ error: 'Champs requis manquants (name, category, price)' });
@@ -124,7 +124,7 @@ router.post('/', verifyAdmin, async (req, res) => {
         service_fee: Number(serviceFee) || 0,
         router_fee: Number(routerFee) || 0,
         features: Array.isArray(features) ? features : [],
-        is_active: true,
+        is_active: isActive !== undefined ? Boolean(isActive) : true,
       }])
       .select();
 
