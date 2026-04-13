@@ -14,6 +14,7 @@ import {
   Package
 } from 'lucide-react';
 import axios from 'axios';
+import { apiUrl } from '@/utils/api';
 
 const AdminSidebar = () => {
   const pathname = usePathname();
@@ -30,12 +31,17 @@ const AdminSidebar = () => {
     try {
       const token = localStorage.getItem('admin_token');
       if (!token) return;
-      const response = await axios.get('http://localhost:5000/api/admin/stats', {
+      const response = await axios.get(apiUrl('/admin/stats'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingCount(response.data.stats?.pending || 0);
-    } catch {
-      console.error('Failed to fetch pending count');
+    } catch (err) {
+      if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
+        localStorage.removeItem('admin_token');
+        router.push('/admin/login');
+        return;
+      }
+      setPendingCount(0);
     }
   };
 

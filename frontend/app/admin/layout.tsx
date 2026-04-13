@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import { Bell, Search } from 'lucide-react';
 import axios from 'axios';
+import { apiUrl } from '@/utils/api';
 
 type AdminNotification = {
   id: string;
@@ -47,10 +48,10 @@ export default function AdminLayout({
       if (!token) return;
 
       const [statsRes, subsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/admin/stats', {
+        axios.get(apiUrl('/admin/stats'), {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://localhost:5000/api/subscriptions?status=pending&page=1&limit=5', {
+        axios.get(apiUrl('/subscriptions?status=pending&page=1&limit=5'), {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);

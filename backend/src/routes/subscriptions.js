@@ -11,17 +11,17 @@ const router = express.Router();
 // POST /api/subscriptions
 router.post('/', async (req, res) => {
   try {
-    const { 
-      offerId, 
-      offerName,
-      offerCategory,
-      clientName, 
-      clientEmail, 
-      clientPhone, 
-      clientCIN, 
-      isFondation, 
-      address,
-      clientAddress,
+    const {
+      offerId: rawOfferId,
+      offerName: rawOfferName,
+      offerCategory: rawOfferCategory,
+      clientName: rawClientName,
+      clientEmail: rawClientEmail,
+      clientPhone: rawClientPhone,
+      clientCIN: rawClientCIN,
+      isFondation,
+      address: rawAddress,
+      clientAddress: rawClientAddress,
       basePrice,
       totalPrice,
       discount,
@@ -29,6 +29,15 @@ router.post('/', async (req, res) => {
       routerFee,
       status
     } = req.body;
+
+    const offerId = String(rawOfferId ?? '').trim();
+    const offerName = String(rawOfferName ?? '').trim();
+    const offerCategory = String(rawOfferCategory ?? '').trim();
+    const clientName = String(rawClientName ?? '').trim();
+    const clientEmail = String(rawClientEmail ?? '').trim();
+    const clientPhone = String(rawClientPhone ?? '').trim();
+    const clientCIN = String(rawClientCIN ?? '').trim();
+    const clientAddress = String(rawClientAddress ?? rawAddress ?? '').trim();
 
     if (!offerId || !clientName || !clientEmail || !clientPhone || !clientCIN) {
       return res.status(400).json({ error: 'Champs requis manquants' });
@@ -45,7 +54,7 @@ router.post('/', async (req, res) => {
           client_email: clientEmail,
           client_phone: clientPhone,
           client_cin: clientCIN,
-          client_address: clientAddress ?? address ?? null,
+          client_address: clientAddress || null,
           is_fondation: isFondation,
           base_price: basePrice,
           discount: discount,

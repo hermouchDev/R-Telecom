@@ -15,29 +15,47 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import StatsCard from '@/components/admin/StatsCard';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { toast } from 'react-hot-toast';
+import { apiUrl } from '@/utils/api';
 
 const AdminOverview = () => {
   const [stats, setStats] = useState<any>(null);
   const [recentSubs, setRecentSubs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('admin_token');
-      const statsRes = await axios.get('http://localhost:5000/api/admin/stats', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const subsRes = await axios.get('http://localhost:5000/api/subscriptions?limit=10&sort=newest', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setStats(statsRes.data.stats);
-      setRecentSubs(subsRes.data.data.slice(0, 10)); // Access the .data property of the response object
+      if (!token) {
+        setStats(null);
+        setRecentSubs([]);
+        return;
+      }
+
+      const [statsRes, subsRes] = await Promise.all([
+        axios.get(apiUrl('/admin/stats'), {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(apiUrl('/subscriptions?limit=10'), {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+
+      setStats(statsRes.data?.stats ?? null);
+      setRecentSubs((subsRes.data?.data ?? []).slice(0, 10));
     } catch (err) {
-      console.error('Failed to fetch dashboard data');
+      if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
+        localStorage.removeItem('admin_token');
+        router.push('/admin/login');
+        return;
+      }
+      setStats(null);
+      setRecentSubs([]);
     } finally {
       setLoading(false);
     }
@@ -47,7 +65,7 @@ const AdminOverview = () => {
     fetchDashboardData();
     const interval = setInterval(fetchDashboardData, 30000); // 30s auto-refresh
     return () => clearInterval(interval);
-  }, []);
+  }, [router]);
 
   if (loading && !stats) return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -176,7 +194,7 @@ const AdminOverview = () => {
                 try {
                   toast.loading('Génération du rapport...', { id: 'report' });
                   const token = localStorage.getItem('admin_token');
-                  const res = await axios.get('http://localhost:5000/api/admin/report', {
+                  const res = await axios.get(apiUrl('/admin/report'), {
                     headers: { Authorization: `Bearer ${token}` },
                     responseType: 'blob'
                   });

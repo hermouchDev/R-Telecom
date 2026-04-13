@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { apiUrl } from '@/utils/api';
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/offers');
+        const response = await axios.get(apiUrl('/offers'));
         setOffers(response.data);
       } catch (err) {
         toast.error('Erreur chargement offres');
@@ -153,17 +154,28 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     try {
       const token = localStorage.getItem('admin_token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
+      const selectedOffer = offers.find((o) => String(o.id) === String(formData.offerId));
+      const normalizedClientName = formData.clientName.trim();
+      const normalizedClientEmail = formData.clientEmail.trim();
+      const normalizedClientPhone = formData.clientPhone.trim();
+      const normalizedClientCIN = formData.clientCIN.trim();
+      const normalizedOfferId = String(formData.offerId || selectedOffer?.id || '').trim();
+
+      if (!normalizedOfferId || !normalizedClientName || !normalizedClientEmail || !normalizedClientPhone || !normalizedClientCIN) {
+        toast.error('Veuillez remplir tous les champs obligatoires.');
+        return;
+      }
+
       const payload = {
-        offerId: formData.offerId,
-        offerName: formData.offerName,
-        offerCategory: formData.offerCategory,
-        clientName: formData.clientName,
-        clientEmail: formData.clientEmail,
-        clientPhone: formData.clientPhone,
-        clientCIN: formData.clientCIN,
-        clientAddress: formData.clientAddress,
-        address: formData.clientAddress,
+        offerId: normalizedOfferId,
+        offerName: formData.offerName || selectedOffer?.name || '',
+        offerCategory: formData.offerCategory || selectedOffer?.category || '',
+        clientName: normalizedClientName,
+        clientEmail: normalizedClientEmail,
+        clientPhone: normalizedClientPhone,
+        clientCIN: normalizedClientCIN,
+        clientAddress: formData.clientAddress.trim(),
+        address: formData.clientAddress.trim(),
         isFondation: formData.isFondation,
         basePrice: formData.basePrice,
         totalPrice: formData.totalPrice,
@@ -174,10 +186,10 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       };
 
       if (isEdit) {
-        await axios.put(`http://localhost:5000/api/subscriptions/${subscription.id}`, payload, config);
+        await axios.put(apiUrl(`/subscriptions/${subscription.id}`), payload, config);
         toast.success('Mise à jour réussie');
       } else {
-        await axios.post('http://localhost:5000/api/subscriptions', payload, config);
+        await axios.post(apiUrl('/subscriptions'), payload, config);
         toast.success('Souscription ajoutée');
       }
       onSuccess();
