@@ -16,7 +16,12 @@ import {
 import axios from 'axios';
 import { apiUrl } from '@/utils/api';
 
-const AdminSidebar = () => {
+interface AdminSidebarProps {
+  className?: string;
+  onNavigate?: () => void;
+}
+
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ className = '', onNavigate }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [pendingCount, setPendingCount] = useState(0);
@@ -73,7 +78,7 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <aside className="w-[260px] bg-dark text-white flex flex-col h-screen fixed left-0 top-0 z-50">
+    <aside className={`w-[260px] bg-dark text-white flex flex-col h-screen ${className}`}>
       <div className="p-8 border-b border-white/5 flex items-center space-x-2">
         <span className="text-3xl font-black text-primary italic tracking-tighter">R+</span>
         <span className="text-xl font-bold tracking-tight">ADMIN</span>
@@ -86,6 +91,7 @@ const AdminSidebar = () => {
             <Link
               key={link.href}
               href={link.href}
+              onClick={onNavigate}
               className={`flex items-center justify-between p-4 rounded-2xl font-bold transition-all group ${
                 isActive
                   ? 'bg-primary text-white shadow-lg shadow-red-500/20'

@@ -74,9 +74,9 @@ const AdminOverview = () => {
   );
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 lg:space-y-12">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-8">
         <StatsCard 
           title="Demandes aujourd'hui" 
           value={stats?.total || 0} 
@@ -110,12 +110,12 @@ const AdminOverview = () => {
         />
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-12">
+      <div className="grid xl:grid-cols-3 gap-6 lg:gap-12">
         {/* Recent Activity */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="xl:col-span-2 space-y-6">
+          <div className="flex items-center justify-between gap-3">
             <h3 className="text-xl font-black text-dark tracking-tight">Activité Récente</h3>
-            <Link href="/admin/demandes" className="text-xs font-black text-primary uppercase tracking-widest hover:underline flex items-center">
+            <Link href="/admin/demandes" className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-widest hover:underline flex items-center shrink-0">
               Voir tout <ArrowRight className="w-3 h-3 ml-1" />
             </Link>
           </div>
@@ -128,19 +128,19 @@ const AdminOverview = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
                   key={sub.id} 
-                  className="p-6 flex items-center justify-between group hover:bg-gray-50/50 transition-colors"
+                  className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 group hover:bg-gray-50/50 transition-colors"
                 >
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
                     <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center font-bold text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                       {sub.client_name.charAt(0)}
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-dark">{sub.client_name}</p>
-                      <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter mt-0.5">{sub.offer_name}</p>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-dark truncate">{sub.client_name}</p>
+                      <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter mt-0.5 truncate">{sub.offer_name}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-8">
+                  <div className="flex items-center gap-3 sm:gap-4 md:gap-8 flex-wrap md:flex-nowrap">
                     <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
                       sub.status === 'approved' ? 'bg-green-100 text-green-600' : 
                       sub.status === 'rejected' ? 'bg-red-100 text-red-600' : 
@@ -148,7 +148,7 @@ const AdminOverview = () => {
                     }`}>
                       {sub.status === 'approved' ? 'Approuvée' : sub.status === 'rejected' ? 'Refusée' : 'En attente'}
                     </span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase w-24 text-right">
+                    <span className="text-[10px] text-gray-400 font-bold uppercase md:w-24 md:text-right">
                       {formatDistanceToNow(new Date(sub.created_at), { addSuffix: true, locale: fr })}
                     </span>
                     <Link 
@@ -161,7 +161,7 @@ const AdminOverview = () => {
                 </motion.div>
               ))
             ) : (
-              <div className="p-20 text-center space-y-4">
+              <div className="p-10 sm:p-16 lg:p-20 text-center space-y-4">
                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
                   <Package className="w-8 h-8" />
                 </div>
@@ -210,14 +210,14 @@ const AdminOverview = () => {
                   toast.error('Erreur de génération', { id: 'report' });
                 }
               }}
-              className="w-full flex items-center p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 text-left group"
+              className="w-full flex items-center p-4 sm:p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 text-left group"
             >
-              <div className="p-3 bg-green-50 text-green-600 rounded-xl mr-4 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-green-50 text-green-600 rounded-xl mr-3 sm:mr-4 group-hover:scale-110 transition-transform">
                 <BarChart3 className="w-5 h-5" />
               </div>
-              <div className="flex-grow">
+              <div className="flex-grow min-w-0">
                 <p className="text-sm font-bold text-dark group-hover:text-primary transition-colors">Télécharger Rapport</p>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Format CSV • Mensuel</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter truncate">Format CSV • Mensuel</p>
               </div>
             </button>
           </div>
@@ -228,13 +228,13 @@ const AdminOverview = () => {
 };
 
 const QuickActionButton = ({ title, subtitle, href, icon, color }: any) => (
-  <Link href={href} className="flex items-center p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 group">
-    <div className={`p-3 ${color} text-white rounded-xl mr-4 group-hover:scale-110 transition-transform`}>
+  <Link href={href} className="flex items-center p-4 sm:p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 group">
+    <div className={`p-3 ${color} text-white rounded-xl mr-3 sm:mr-4 group-hover:scale-110 transition-transform`}>
       {icon}
     </div>
-    <div className="flex-grow">
+    <div className="flex-grow min-w-0">
       <p className="text-sm font-bold text-dark group-hover:text-primary transition-colors">{title}</p>
-      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{subtitle}</p>
+      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter truncate">{subtitle}</p>
     </div>
     <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
   </Link>

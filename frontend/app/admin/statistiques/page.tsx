@@ -3,22 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   BarChart, Bar, PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
 import { 
-  TrendingUp, 
-  TrendingDown, 
+  TrendingUp,
   Target, 
   PieChart as PieIcon, 
   BarChart3, 
-  Calendar,
   Zap,
   Loader2,
   CalendarDays
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { apiUrl } from '@/utils/api';
 
 const COLORS = ['#CC0000', '#111111', '#444444', '#888888', '#CCCCCC'];
 
@@ -26,12 +25,13 @@ const StatistiquesPage = () => {
   const [data, setData] = useState<any>(null);
   const [range, setRange] = useState('30d');
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   const fetchStats = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await axios.get(`http://localhost:5000/api/admin/stats/full?range=${range}`, {
+      const response = await axios.get(apiUrl(`/admin/stats/full?range=${range}`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData(response.data);
@@ -46,6 +46,13 @@ const StatistiquesPage = () => {
     fetchStats();
   }, [range]);
 
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   if (loading && !data) return (
     <div className="flex flex-col items-center justify-center min-h-[400px]">
       <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
@@ -59,19 +66,19 @@ const StatistiquesPage = () => {
   ];
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="space-y-8 lg:space-y-12 pb-10 lg:pb-20">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-dark tracking-tight">Analyse de Performance</h1>
-          <p className="text-gray-400">Suivi des revenus, conversions et tendances.</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-dark tracking-tight">Analyse de Performance</h1>
+          <p className="text-sm text-gray-400">Suivi des revenus, conversions et tendances.</p>
         </div>
         
-        <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex flex-wrap bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 w-full md:w-auto gap-1">
           {['7d', '30d', '90d', 'all'].map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              className={`px-3 sm:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                 range === r ? 'bg-primary text-white shadow-lg shadow-red-500/20' : 'text-gray-400 hover:text-dark'
               }`}
             >
@@ -82,7 +89,7 @@ const StatistiquesPage = () => {
       </header>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
         <KPICard title="Total Souscriptions" value={data?.totalSubscriptions || 0} icon={<CalendarDays className="w-5 h-5"/>} color="blue" />
         <KPICard title="Revenus Total" value={data?.totalRevenue || 0} unit="DH" icon={<TrendingUp className="w-5 h-5"/>} color="green" />
         <KPICard title="Taux d'approbation" value={`${data?.approvalRate || 0}%`} icon={<Target className="w-5 h-5"/>} color="orange" />
@@ -90,20 +97,20 @@ const StatistiquesPage = () => {
       </div>
 
       {/* Main Revenue Chart */}
-      <section className="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100">
-        <div className="flex items-center justify-between mb-8">
+      <section className="bg-white p-4 sm:p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
             <h3 className="text-xl font-black text-dark tracking-tight">Courbe des Revenus</h3>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Progression quotidienne des ventes</p>
           </div>
-          <div className="text-right">
-             <span className="text-2xl font-black text-dark">{data?.totalRevenue || 0} DH</span>
+          <div className="sm:text-right">
+             <span className="text-xl sm:text-2xl font-black text-dark">{data?.totalRevenue || 0} DH</span>
              <p className="text-[10px] text-green-500 font-black uppercase tracking-widest">Sur la période</p>
           </div>
         </div>
         
-        <div className="h-[350px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[280px] sm:h-[350px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data?.revenueByDay || []}>
               <defs>
                 <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
@@ -117,6 +124,8 @@ const StatistiquesPage = () => {
                 axisLine={false} 
                 tickLine={false} 
                 tick={{fontSize: 10, fontWeight: 700, fill: '#999'}} 
+                interval={isMobile ? 'preserveStartEnd' : 0}
+                minTickGap={isMobile ? 32 : 12}
                 dy={10}
               />
               <YAxis 
@@ -130,45 +139,45 @@ const StatistiquesPage = () => {
               />
               <Area type="monotone" dataKey="amount" stroke="#CC0000" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
             </AreaChart>
-          </ResponsiveContainer>
+            </ResponsiveContainer>
         </div>
       </section>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid xl:grid-cols-2 gap-4 lg:gap-8">
         {/* Category Breakdown */}
-        <div className="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100">
-          <h3 className="text-xl font-black text-dark tracking-tight mb-8 flex items-center">
+        <div className="bg-white p-4 sm:p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100">
+          <h3 className="text-lg sm:text-xl font-black text-dark tracking-tight mb-6 lg:mb-8 flex items-center">
             <BarChart3 className="w-5 h-5 mr-3 text-primary" />
             Souscriptions par catégorie
           </h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[260px] sm:h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.byCategory || []}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} dy={10} />
+                <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} dy={10} interval={isMobile ? 'preserveStartEnd' : 0} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 700}} />
                 <Tooltip cursor={{fill: '#f8f8f8'}} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} />
                 <Bar dataKey="count" fill="#CC0000" radius={[8, 8, 0, 0]} barSize={40} />
               </BarChart>
-            </ResponsiveContainer>
+              </ResponsiveContainer>
           </div>
         </div>
 
         {/* Public vs Fondation */}
-        <div className="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100">
-          <h3 className="text-xl font-black text-dark tracking-tight mb-8 flex items-center">
+        <div className="bg-white p-4 sm:p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100">
+          <h3 className="text-lg sm:text-xl font-black text-dark tracking-tight mb-6 lg:mb-8 flex items-center">
             <PieIcon className="w-5 h-5 mr-3 text-primary" />
             Grand Public vs Fondation
           </h3>
-          <div className="h-[300px] w-full relative">
+          <div className="h-[280px] sm:h-[300px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={pieData}
                   cx="50%"
                   cy="45%"
-                  innerRadius={80}
-                  outerRadius={100}
+                  innerRadius={isMobile ? 55 : 80}
+                  outerRadius={isMobile ? 78 : 100}
                   paddingAngle={8}
                   dataKey="value"
                 >
@@ -181,7 +190,7 @@ const StatistiquesPage = () => {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-              <span className="text-3xl font-black text-dark leading-none">{data?.totalSubscriptions || 0}</span>
+              <span className="text-2xl sm:text-3xl font-black text-dark leading-none">{data?.totalSubscriptions || 0}</span>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Total</p>
             </div>
           </div>
@@ -189,12 +198,40 @@ const StatistiquesPage = () => {
       </div>
 
       {/* Performance Table */}
-      <section className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden">
-        <div className="p-8 border-b border-gray-50">
-           <h3 className="text-xl font-black text-dark tracking-tight">Performance par offre</h3>
+      <section className="bg-white rounded-[2rem] lg:rounded-[2.5rem] shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden">
+        <div className="p-5 sm:p-8 border-b border-gray-50">
+           <h3 className="text-lg sm:text-xl font-black text-dark tracking-tight">Performance par offre</h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        <div className="md:hidden p-4 space-y-3">
+          {data?.byCategory?.map((item: any, index: number) => (
+            <div key={index} className="rounded-2xl border border-gray-100 p-4">
+              <p className="font-black text-dark">{item.category}</p>
+              <div className="mt-2 flex items-center justify-between text-xs">
+                <span className="text-gray-500">Souscriptions</span>
+                <span className="font-black">{item.count}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mt-1">
+                <span className="text-gray-500">Revenus</span>
+                <span className="font-black text-primary">{item.revenue} DH</span>
+              </div>
+              <div className="flex items-center justify-between text-xs mt-1">
+                <span className="text-gray-500">% Fondation</span>
+                <span className="font-black">{item.fondationPct}%</span>
+              </div>
+              <div className="mt-2">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-gray-500">Taux approbation</span>
+                  <span className="font-black">{item.approvalRate}%</span>
+                </div>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-green-500" style={{ width: `${item.approvalRate}%` }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full min-w-[900px] text-left">
             <thead>
               <tr className="bg-gray-50/50 text-[10px] font-black uppercase tracking-widest text-gray-400">
                 <th className="px-10 py-5">Offre</th>
@@ -243,15 +280,15 @@ const KPICard = ({ title, value, unit, icon, color, subText }: any) => {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100"
+      className="bg-white p-5 sm:p-8 rounded-[2rem] lg:rounded-[2.5rem] shadow-sm border border-gray-100"
     >
-      <div className={`p-4 rounded-2xl ${colorMap[color]} w-fit mb-6 shadow-lg shadow-black/5`}>
+      <div className={`p-3 sm:p-4 rounded-2xl ${colorMap[color]} w-fit mb-4 sm:mb-6 shadow-lg shadow-black/5`}>
         {icon}
       </div>
       <div>
         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{title}</p>
         <div className="flex items-baseline space-x-2">
-           <span className="text-2xl font-black text-dark tracking-tighter">{value}</span>
+           <span className="text-xl sm:text-2xl font-black text-dark tracking-tighter">{value}</span>
            {unit && <span className="text-sm font-bold text-gray-400">{unit}</span>}
         </div>
         {subText && <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-1">{subText}</p>}

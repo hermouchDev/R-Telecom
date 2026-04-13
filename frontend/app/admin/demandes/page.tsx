@@ -15,6 +15,7 @@ import { toast } from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import SubscriptionTable from '@/components/admin/SubscriptionTable';
 import SubscriptionModal from '@/components/admin/SubscriptionModal';
+import { apiUrl } from '@/utils/api';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -45,7 +46,7 @@ const SubscriptionsPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await axios.get('http://localhost:5000/api/subscriptions', {
+      const response = await axios.get(apiUrl('/subscriptions'), {
         params: {
           page: currentPage,
           limit: ITEMS_PER_PAGE,
@@ -87,7 +88,7 @@ const SubscriptionsPage = () => {
     try {
       const token = localStorage.getItem('admin_token');
       await axios.patch(
-        `http://localhost:5000/api/subscriptions/${id}/status`,
+        apiUrl(`/subscriptions/${id}/status`),
         { status: 'approved' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -103,7 +104,7 @@ const SubscriptionsPage = () => {
     try {
       const token = localStorage.getItem('admin_token');
       await axios.patch(
-        `http://localhost:5000/api/subscriptions/${id}/status`,
+        apiUrl(`/subscriptions/${id}/status`),
         { status: 'rejected' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -118,7 +119,7 @@ const SubscriptionsPage = () => {
     if (!confirm('ETES-VOUS SUR ? Cette action est irreversible.')) return;
     try {
       const token = localStorage.getItem('admin_token');
-      await axios.delete(`http://localhost:5000/api/subscriptions/${id}`, {
+      await axios.delete(apiUrl(`/subscriptions/${id}`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Souscription supprimee');
@@ -174,23 +175,23 @@ const SubscriptionsPage = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-dark tracking-tight">Gestion des Demandes</h1>
-          <p className="text-gray-400">Consultez, modifiez ou gerez les souscriptions clients.</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-dark tracking-tight">Gestion des Demandes</h1>
+          <p className="text-sm text-gray-400">Consultez, modifiez ou gerez les souscriptions clients.</p>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
           <button
             onClick={handleExport}
-            className="bg-white hover:bg-gray-50 text-dark border border-gray-100 font-black px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center space-x-3 text-sm"
+            className="flex-1 sm:flex-none bg-white hover:bg-gray-50 text-dark border border-gray-100 font-black px-4 sm:px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center space-x-2 sm:space-x-3 text-xs sm:text-sm"
           >
             <Download className="w-4 h-4 text-primary" />
             <span className="hidden sm:inline">EXPORTER</span>
           </button>
           <button
             onClick={handleAddOpen}
-            className="bg-primary hover:bg-red-700 text-white font-black px-8 py-3 rounded-2xl shadow-xl shadow-red-500/20 transition-all flex items-center space-x-3 text-sm"
+            className="flex-1 sm:flex-none bg-primary hover:bg-red-700 text-white font-black px-5 sm:px-8 py-3 rounded-2xl shadow-xl shadow-red-500/20 transition-all flex items-center justify-center space-x-2 sm:space-x-3 text-xs sm:text-sm"
           >
             <Plus className="w-5 h-5" />
             <span>AJOUTER</span>
@@ -198,7 +199,7 @@ const SubscriptionsPage = () => {
         </div>
       </header>
 
-      <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-gray-200/40 border border-gray-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+      <div className="bg-white p-4 sm:p-6 rounded-[2rem] shadow-xl shadow-gray-200/40 border border-gray-100 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
         <div className="space-y-2">
           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Recherche</label>
           <div className="relative group">
@@ -261,9 +262,9 @@ const SubscriptionsPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden min-h-[400px]">
+      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden min-h-[400px]">
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-20 space-y-4">
+          <div className="flex flex-col items-center justify-center p-10 sm:p-16 lg:p-20 space-y-4">
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
             <p className="text-sm font-bold text-gray-300 uppercase tracking-widest leading-none mt-4">Chargement des donnees...</p>
           </div>
@@ -285,11 +286,11 @@ const SubscriptionsPage = () => {
           </div>
         )}
 
-        <div className="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+        <div className="px-4 sm:px-8 py-4 sm:py-6 bg-gray-50/50 border-t border-gray-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">
             Affichage de {filteredSubs.length} sur {totalCount} demandes
           </p>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}

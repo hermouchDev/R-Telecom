@@ -2,19 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
-  Eye, 
-  CheckCircle2, 
-  XCircle, 
-  Star, 
+import {
+  Eye,
+  CheckCircle2,
+  XCircle,
+  Star,
   Edit2,
-  Trash2,
-  MoreVertical,
-  Calendar,
-  CreditCard
+  Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 interface SubscriptionTableProps {
   subscriptions: any[];
@@ -32,8 +28,61 @@ const SubscriptionTable: React.FC<SubscriptionTableProps> = ({
   onDelete
 }) => {
   return (
-    <div className="overflow-x-auto text-nowrap">
-      <table className="w-full text-left">
+    <div>
+      <div className="md:hidden space-y-3 p-3">
+        {subscriptions.map((sub) => (
+          <div key={sub.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-black text-dark truncate">{sub.client_name}</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter truncate">{sub.client_email}</p>
+                <p className="text-[10px] font-mono text-gray-400 mt-1">#{sub.id.substring(0, 8).toUpperCase()}</p>
+              </div>
+              <StatusBadge status={sub.status} />
+            </div>
+
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{sub.offer_category}</p>
+                <p className="text-xs font-bold text-dark truncate">{sub.offer_name}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-black text-dark">{sub.total_price} DH</p>
+                {sub.is_fondation && <p className="text-[10px] text-primary font-black uppercase">Fondation</p>}
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                href={`/admin/demandes/${sub.id}`}
+                className="p-2 bg-gray-100 text-gray-500 rounded-xl"
+                title="Voir Détails"
+              >
+                <Eye className="w-4 h-4" />
+              </Link>
+              <button onClick={() => onEdit(sub)} className="p-2 bg-gray-100 text-gray-500 rounded-xl" title="Modifier">
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button onClick={() => onDelete(sub.id)} className="p-2 bg-red-50 text-red-600 rounded-xl" title="Supprimer">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              {sub.status === 'pending' && (
+                <>
+                  <button onClick={() => onApprove(sub.id)} className="p-2 bg-green-50 text-green-600 rounded-xl" title="Approuver">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => onReject(sub.id)} className="p-2 bg-red-50 text-red-600 rounded-xl" title="Rejeter">
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:block overflow-x-auto">
+      <table className="w-full min-w-[980px] text-left">
         <thead>
           <tr className="bg-gray-50/50 text-[10px] font-black uppercase tracking-[0.1em] text-gray-400">
             <th className="px-8 py-5"># ID</th>
@@ -139,6 +188,7 @@ const SubscriptionTable: React.FC<SubscriptionTableProps> = ({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

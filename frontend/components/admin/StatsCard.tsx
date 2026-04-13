@@ -33,14 +33,14 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, unit, trend, trendD
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`p-6 rounded-[2rem] border bg-white shadow-sm hover:shadow-xl transition-all duration-300 group`}
+      className="p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border bg-white shadow-sm hover:shadow-xl transition-all duration-300 group"
     >
-      <div className="flex justify-between items-start mb-4">
-        <div className={`p-4 rounded-2xl ${iconBgMap[color]} shadow-lg transition-transform group-hover:scale-110`}>
+      <div className="flex justify-between items-start mb-3 sm:mb-4 gap-2">
+        <div className={`p-3 sm:p-4 rounded-2xl ${iconBgMap[color]} shadow-lg transition-transform group-hover:scale-110`}>
           {icon}
         </div>
         {trend && (
-          <div className={`flex items-center space-x-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+          <div className={`flex items-center space-x-1 px-2 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest ${
             trendDirection === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
           }`}>
             {trendDirection === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -52,7 +52,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, unit, trend, trendD
       <div>
         <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">{title}</h4>
         <div className="flex items-baseline space-x-1">
-          <span className="text-3xl font-black text-dark tracking-tighter">{value}</span>
+          <span className="text-2xl sm:text-3xl font-black text-dark tracking-tighter">{value}</span>
           {unit && <span className="text-sm font-bold text-gray-400 uppercase">{unit}</span>}
         </div>
         {trend && (
