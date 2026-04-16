@@ -17,6 +17,78 @@ Professional full-stack platform for telecom subscription management, admin oper
 
 ## Overview
 
+R+Telecom/
+├── frontend/                  # Next.js App
+│   ├── app/
+│   │   ├── page.tsx           # Homepage
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── offres/
+│   │   │   ├── fibre/page.tsx
+│   │   │   ├── mobile/page.tsx
+│   │   │   ├── 5g/page.tsx
+│   │   │   └── adsl/page.tsx
+│   │   ├── calculateur/page.tsx
+│   │   ├── souscrire/page.tsx
+│   │   └── admin/
+│   │       ├── login/page.tsx         # Admin login
+│   │       ├── layout.tsx             # Admin layout + sidebar
+│   │       ├── page.tsx               # Overview dashboard
+│   │       ├── demandes/
+│   │       │   ├── page.tsx           # Subscriptions list
+│   │       │   └── [id]/page.tsx      # Subscription detail
+│   │       ├── documents/page.tsx     # Uploaded documents viewer
+│   │       └── statistiques/page.tsx  # Charts & analytics
+│   ├── components/
+│   │   ├── Navbar.tsx
+│   │   ├── Hero.tsx
+│   │   ├── OfferCard.tsx
+│   │   ├── Calculator.tsx
+│   │   ├── Chatbot.tsx
+│   │   ├── QRCode.tsx
+│   │   ├── UploadForm.tsx
+│   │   ├── Footer.tsx
+│   │   └── admin/
+│   │       ├── AdminSidebar.tsx
+│   │       ├── StatsCard.tsx
+│   │       ├── SubscriptionTable.tsx
+│   │       ├── SubscriptionDetail.tsx
+│   │       ├── DocumentViewer.tsx
+│   │       └── StatusBadge.tsx
+│   ├── lib/
+│   │   ├── supabase.ts
+│   │   ├── adminAuth.ts
+│   │   └── utils.ts
+│   ├── public/
+│   │   └── logo.png           # R+ TELECOM logo
+│   ├── tailwind.config.ts
+│   └── package.json
+│
+├── backend/                   # Node.js API
+│   ├── src/
+│   │   ├── index.js           # Entry point
+│   │   ├── routes/
+│   │   │   ├── offers.js
+│   │   │   ├── subscriptions.js
+│   │   │   ├── uploads.js
+│   │   │   ├── contracts.js
+│   │   │   ├── chat.js
+│   │   │   ├── qrcode.js
+│   │   │   └── admin.js
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   └── upload.js
+│   │   └── services/
+│   │       ├── pdf.js
+│   │       ├── email.js        # Resend service
+│   │       └── qrcode.js
+│   ├── .env
+│   └── package.json
+│
+└── README.md
+
+
+
+
 R+ TELECOM is composed of two applications:
 
 - `frontend`: Next.js web app (admin dashboard + client flows)
